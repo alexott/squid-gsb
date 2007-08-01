@@ -1,0 +1,775 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+
+
+
+
+
+
+
+
+  
+    
+
+
+
+<meta http-equiv="content-type" content="text/html; charset=utf-8"><title>Safe Browsing API - Safe Browsing API</title>
+
+<link href="developers_guide_files/base-200612.css" type="text/css" rel="stylesheet">
+
+
+    <link href="developers_guide_files/dev_docs.css" rel="stylesheet" type="text/css">
+    <link href="developers_guide_files/product-page.css" rel="stylesheet" type="text/css"></head><body>
+    
+
+
+
+
+
+
+
+<div id="gaia">
+  &nbsp;
+</div>
+
+<div id="header">
+  <div id="logo"><a href="http://code.google.com/"><img src="developers_guide_files/code_sm.png" alt="Google"></a></div>
+  <div id="title">
+    
+      Google Safe Browsing API
+    
+  </div>
+  <div id="breadcrumbs">
+    
+      <span class="item"><a href="http://code.google.com/">Google Code Home</a></span> &gt;
+      
+  <span class="item"><a href="http://code.google.com/apis/safebrowsing/">Google Safe Browing API</a></span>
+  
+    &gt; 
+  <span class="item"><a class="selected" href="http://code.google.com/apis/safebrowsing/developers_guide.html">Developer's Guide</a></span>
+
+  
+
+    
+  </div>
+</div>
+
+<div id="side" dir="ltr">
+  <div id="menu">
+    
+      
+<h4>Safe Browsing API</h4>
+
+<ul>
+  <li><a href="http://code.google.com/apis/safebrowsing/">Overview</a></li>
+  <li><a href="http://code.google.com/apis/safebrowsing/key_signup.html">Sign up for an API key</a></li>
+  <li><a class="selected" href="http://code.google.com/apis/safebrowsing/developers_guide.html">Developer's Guide</a></li>
+  <li><a href="http://code.google.com/apis/safebrowsing/reference.html">Reference Guide</a></li>
+  <li><a href="http://groups.google.com/group/google-safe-browsing-api">Discussion Group</a></li>
+</ul>
+
+    
+  </div>
+
+  <div id="search">
+  <form id="searchbox_015986126177484454297:pfmwlvdl42y" action="http://www.google.com/cse">
+    <input name="cx" value="015986126177484454297:pfmwlvdl42y" type="hidden">
+    <input name="cof" value="FORID:0" type="hidden">
+	<div class="header">Search Google Code:</div>
+          <input style="background: rgb(255, 255, 255) url(http://google.com/coop/images/google_custom_search_watermark.gif) no-repeat scroll left center; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;" name="q" size="20" type="text">
+          <input name="sa" value="Search" type="submit"><br>
+        </form>
+        <script type="text/javascript" src="developers_guide_files/brand.html"></script>
+      </div>
+    
+  </div>
+
+
+
+
+<script type="text/javascript">
+//<![CDATA[
+
+function walk(element, condition, operation) {
+  if (!element) return;
+  if (condition(element)) {
+    operation(element);
+    return;
+  }
+  for (var e = element.firstChild; e != null; e = e.nextSibling) {
+    walk(e, condition, operation);
+  }
+}
+
+function isCurrentLink(e) {
+  return e.tagName == "A" && e.href == window.location.href;
+}
+
+function makeSelected(e) {
+  e.className = "selected";
+}
+
+walk(document.getElementById("breadcrumbs"), isCurrentLink, makeSelected);
+walk(document.getElementById("menu"), isCurrentLink, makeSelected);
+
+//]]>
+</script>
+
+<div id="body">
+
+
+
+    <h1 id="page_title">Safe Browsing API Developer's Guide</h1>
+
+    <p>
+     The Safe Browsing API is an experimental API that allows client
+      applications to check URLs against Google's constantly-updated
+      blacklists of suspected phishing and malware pages. Your client 
+      application can use the API to download an encrypted table for 
+      local, client-side lookups of URLs.
+    </p>
+    <p>
+      In addition to providing some background on the capabilities of
+      the Safe Browsing API, this document provides examples for
+      interacting with the API by sending HTTP messages to download lists or
+      perform lookups. This document also includes information and examples
+      on how to perform client-side lookups from a downloaded list.
+    </p>
+  <h1>Contents</h1>  
+  <div class="toc">
+	<ol>
+	  <li><a href="#Audience">Audience</a></li>
+	  <li><a href="#GettingStarted">Getting started</a></li>
+	  <li><a href="#GetKeyRequests">GetKey Requests</a>
+      <ol>
+        <li><a href="#GetKeyDescription">Description</a></li>
+		<li><a href="#ServerResponse">Server Response</a></li>
+      </ol></li>
+	  <li><a href="#UpdateRequests">Update Requests</a>
+	  <ol>
+		<li><a href="#UpdateDescription">Description</a></li>
+		<li><a href="#UpdateParams">Parameters</a></li>
+	  </ol></li>
+	  <li><a href="#MessageAuthentication">Message Authentication</a></li>
+	  <li><a href="#AcceptableUsage">Acceptable Usage in Clients</a>
+	  <ol>
+		<li><a href="#UpdateBackoff">Client Update Frequency and Back-off</a></li>
+		<li><a href="#Throttling">Throttling Clients</a></li>
+	  </ol></li>
+	  <li><a href="#ReportingData">Reporting Incorrect Data</a>
+	  <ol>
+		<li><a href="#ReportPhishNeg">Reporting Phishing URLs</a></li>
+		<li><a href="#ReportPhishPos">Reporting Phishing Errors</a></li>
+		<li><a href="#ReportMalwareURL">Reporting Malware URLs</a></li>
+		<li><a href="#ReportMalware">Reporting Malware Errors</a></li>
+	  </ol></li>
+	  <li><a href="#ListFormat">List Format</a>
+	  <ol>
+		<li><a href="#SuffixPrefix">Suffix/Prefix Expressions</a></li>
+		<li><a href="#PerformingLookups">Performing Lookups</a></li>
+	    <li><a href="#Canonicalization">Canonicalization</a></li>
+	  </ol></li>
+  </ol></div>
+
+  <h1><a name="Audience" id="Audience"></a>Audience</h1>
+  <p>This document is intended for programmers who want to use Google anti-phishing
+  and anti-malware data to protect users from potentially malicious
+  websites. It provides a series of examples of basic data API
+  interactions, a set of guidelines for how the data may be accessed, and
+  information on how the data can be used. <b>Please
+  note that the data format is likely to change in the future.</b>
+  </p>
+  <h1><a name="Overview" id="Overview"></a>Overview</h1>
+  <p>
+    Google publishes phishing and malware data in 2 separate blacklists
+    (<b>goog-black-hash</b> and
+    <b>goog-malware-hash</b>). Each is a list of
+    md5 hash values. The client should keep a local copy of the lists and
+    consult them for every URL the user visits. The client should store the
+    lists as it receives them and make no attempt to convert a hashed list to
+    plaintext. Clients should optimally update their lists every 30 minutes by
+    contacting Google to check for new data. <b>Your
+    application is not permitted to show warnings to end users unless it has
+    requested an update in the last 30 minutes without receiving an error
+    response</b>. Also, if you do show warnings to end users, you must adhere
+    to Google's guidelines for the warning text and provide appropriate
+    attribution as discussed below under <em>End
+    User Visible Warnings</em>.
+  </p>
+  <p>
+    We will limit the number of users you can support with a single API key. 
+    If you expect to have more than 10,000 users sending regular requests to 
+    the API, you must contact us by sending email to 
+    antiphish-malware-cap-req@google.com.
+  </p> 
+  <p>
+    Lists are versioned with a major and minor number. The major version is
+    currently 1, and is used to describe the wire format for serializing the
+    lists (see below). The minor number indicates the version of the list. When
+    we add or remove items from a list, we increment its minor version number.
+  </p>
+  <p>
+    The client should record which lists it knows about and their version
+    numbers (-1 for no existing version). To request an update from the update
+    server, the client should use GET with the desired list names and version
+    numbers as a query parameter: <code>version=type:major:minor[,type:major:minor]*</code>. For example:
+  </p>
+  <pre>http://sb.google.com/safebrowsing/update?client=api&amp;apikey=&lt;yourkey&gt;&amp;version=goog-black-hash:1:432,goog-malware-hash:1:-1<br></pre>
+  <p>
+    The server responds with updates to all lists in the wire format. For each
+    list the response includes either a completely new list or a diff between
+    the client's version of the list and the most current version, whichever is
+    smaller.&nbsp; If there is no change to a list since the last update, the
+    server will not include it in the response.
+  </p>
+  <h1><a name="GettingStarted" id="GettingStarted"></a>Getting Started</h1>
+  <p>
+  First you need to request an API key, which will authenticate you as an API
+  user. In order to obtain an API key, you must have a Google account. You may
+  create a Google account or log in with your existing Google account and sign
+  up for the API at
+  <a href="http://code.google.com/apis/safebrowsing/key_signup.html">http://www.google.com/safebrowsing/key_signup.html</a></p>
+  <p>
+  Please note that if you violate the requirements detailed in the <b>Acceptable
+  Usage in Clients</b> section, your key may be disabled for a period of
+  time.</p>
+  <p>Next you should decide whether you wish to use a Message Authentication Code
+  (MAC) for your list updates. A MAC allows you to verify the integrity of the
+  data that you receive from the server.&nbsp; If you choose to use a MAC, you
+  must first make a
+  <span style="font-family: Courier New; font-weight: bold;">getkey</span>
+  request as described below.  Otherwise, you only need to use the
+  <span style="font-family: Courier New; font-weight: bold;">update request.</span>
+  
+  </p>
+
+  <h1><a name="GetKeyRequests" id="GetKeyRequests"></a>GetKey Requests (optional)</h1>
+
+  <h2><a name="GetKeyDescription" id="GetKeyDescription"></a>Description</h2>
+  <p>
+    The <span style="font-family: Courier New; font-weight: bold;">getkey</span>
+    request may be used at client startup to create a shared secret key between
+    the client and the server. The secret key is optional and can be used to
+    authenticate list updates. To be secure, the
+    <span style="font-family: Courier New; font-weight: bold;">getkey</span>
+    request uses SSL.
+  </p>
+  <p>
+  This is the url for the
+  <span style="font-family: Courier New; font-weight: bold;">getkey</span>
+  <span style="font-family: Courier New;"></span>request:<br>
+     </p><pre>https://sb-ssl.google.com/safebrowsing/getkey?client=api</pre>
+  <h2><a name="ServerResponse" id="ServerResponse"></a>Server Response</h2>
+  <p>
+    The server responds with key-value pairs, in this format:
+    <span style="font-family: Courier New;">key:&lt;value length&gt;:value</span>
+  </p>
+  <p>
+    In this case, the server will respond with a clientkey and wrappedkey.&nbsp;
+    For example:<br>
+  </p>
+  <pre>clientkey:24:pOAblTUiZFkLSv3xRiXKKQ==<br>wrappedkey:24:MTqdJvrixHRGAyfebvaQWYda<br></pre>
+  <p>
+    The client key is a 16-byte, base-64 encoded random nonce, generated by the
+    server when receiving the GetKey request. The wrapped key is the random
+    nonce encrypted by a server key. The wrappedkey is opaque to the client and
+    a server may implement any encryption algorithm it sees fit. The wrappedkey
+    allows the server to reconstruct the client key without requiring per-client
+    state. It is up to the server to include verification information into the
+    wrapped key that might allow it to determine if decrypting it was
+    successful. If the server key changes, the server can prepend
+    <span style="font-family: Courier New;"><span style="font-weight: bold;">pleaserekey</span></span>
+    to responses to tell the client to request a new client key.
+  </p>
+  <p>
+  The GetKey request should only be called once per client, as well as once per
+  <span style="font-family: Courier New; font-weight: bold;">pleaserekey</span>
+  response.<br>
+
+</p><h1><a name="UpdateRequests" id="UpdateRequests"></a>Update Requests</h1>
+  <h2><a name="UpdateDescription" id="UpdateDescription"></a>Description</h2>
+  <p>
+  The <span style="font-family: Courier New; font-weight: bold;">update</span>
+  request is used to ask for updates to the phishing or malware data. The client
+  should provide the lists that it wants the server to update. The server either
+  provides the full content of the current lists or incremental updates to bring
+  the client's lists up to the current version.</p>
+  <p>
+  This is the url for the
+  <span style="font-family: Courier New; font-weight: bold;">update</span> request:<br>
+  </p><pre>http://sb.google.com/safebrowsing/update?client=api</pre>
+  <h2><a name="UpdateParams" id="UpdateParams"></a>Parameters</h2>
+  <p>
+  The <span style="font-family: Courier New; font-weight: bold;">update</span>
+  <span style="font-family: Courier New;"></span>request takes three required
+  parameters
+  (<span style="font-family: Courier New; font-weight: bold;">client=api</span>,
+  <span style="font-family: Courier New;">apikey</span> and
+  <span style="font-weight: bold;"><span style="font-family: Courier New;">version</span></span><span class="body">)</span>
+  and one optional parameter
+  (<span style="font-family: Courier New; font-weight: bold;">wrkey</span>).&nbsp;
+  The <span style="font-family: Courier New;">apikey</span> parameter should be
+  the key you received by signing up for API usage (see the <em>Getting
+  Started</em> section).&nbsp; The
+  <span style="font-family: Courier New; font-weight: bold;">version</span>
+  parameter specifies the lists and versions that the client has, i.e.
+  "version=goog-black-hash:1:432,goog-malware-hash:1:32".&nbsp; The optional
+  <span style="font-family: Courier New; font-weight: bold;">wrkey</span>
+  <span style="font-family: Courier New;"></span>parameter should be the wrapped
+  key sent by the server in response to a
+  <span style="font-family: Courier New; font-weight: bold;">getkey</span> request
+  and should only be used if the client wishes to receive a MAC. See the
+  <span style="font-style: italic;">GetKey Request</span> and
+  <span style="font-style: italic;">Message Authentication Code for Updates</span>
+  sections for more information on the MAC.<br>
+
+
+
+</p><h2><a name="UpdateResponse" id="UpdateResponse"></a>Server Response</h2>
+  <p>
+    The serialized form of the lists is called the wire format. This is the form
+    of update responses and is a simple line-oriented protocol. Clients should
+    ignore any malformed lines.
+  </p>
+  <p>
+    It consists of a sequence of sections each consisting of a header line such
+    as <span style="font-family: Courier New; font-weight: bold;">[type major.minor
+    [update]][[mac=&lt;digest&gt;]]</span> followed by lines of data comprising
+    the list described by the header. If the
+    <span style="font-family: Courier New; font-weight: bold;">update</span> token
+    appears in the header line, the data following constitutes an update to the
+    client's existing list. If not, the data specifies a full, new list and the
+    client should discard any old data for that list. If the client provided a
+    <span style="font-family: Courier New; font-weight: bold;">wrappedkey</span> in
+    the request, the response must include the MAC. Here are a few possible
+    first-line header responses:
+  </p> 
+
+ <pre>  [goog-black-hash 1.372 update]
+  [goog-black-hash 1.372]
+  [goog-malware-hash 1.10][mac=iA5vLUidpXAPwfcAH9+8OQ==]
+  [goog-malware-hash 1.10 update][mac=iA5vLUidpXAPwfcAH9+8OQ==]</pre>
+  <p>
+    The header line will be followed by data lines which begin with a + or -. A
+    plus indicates an addition to the table and is followed by a tab-separated
+    key/value pair. A minus means to remove a key from the table and is followed
+    by the key itself.
+  </p>
+  <p>
+    An example update response is:
+  </p>
+   <pre>  [goog-black-hash 1.419 update]
+  -5a76ceebafdc7b72883e5c8212d0b046
+  +76fa3d25e1dd28913ff829143fec7aa3
+  +a1b2324852d1368fbe14df5920881a08
+  -b3c780524ac86cdfe51fe6709c49e8a6
+  ...
+  [goog-malware-hash 1.201]
+  +000a8a2973c056d87ac25a6900f3a720
+  +01faf1b9baf0b4f3284cc3f56b9bafb7
+  +2f0cf74439cffbe0c988b034f6dd46ba
+  ...</pre>
+ 
+  <p>
+    In this example, the client has some version of
+    <span style="font-family: Courier New; font-weight: bold;">goog-black-hash</span>
+    prior to 419 and the server is telling the client to bring itself up to
+    version 419 by applying the adds and deletes that follow. The second header
+    indicates that a full, new table is replacing
+    <span style="font-family: Courier New; font-weight: bold;">goog-malware-hash</span>.
+    This suggests that the client has some version of
+    <span style="font-family: Courier New; font-weight: bold;">goog-malware-hash</span>
+    earlier than version 201, but the diff would be longer than the entire
+    version 201 table, so it is sending a complete replacement.
+  </p>
+ 
+ <h1><a name="MessageAuthentication" id="MessageAuthentication"></a>Message Authentication Code for Updates</h1>
+  <p>
+    If the client provided a wrapped key in the update request, the server also
+    needs to compute a MAC for the response data that the client can use to
+    verify the integrity of the lists. The MAC is computed from an MD5 Digest
+    over the following information: client_key|separator|table
+    data|separator|client_key. The separator is the
+    string<span style="font-family: Courier New; font-weight: bold;">:coolgoog:</span>
+    - that is a colon followed by "coolgoog" followed by a colon. The resulting
+    128-bit MD5 digest is websafe base-64 encoded and provided via
+    [mac=&lt;encoded digest&gt;] on the first line of a table update; see below.
+  </p>
+  <p>
+    Here is an example that you can use to verify the MAC algorithm in your
+    server:
+  </p>
+<pre>client key: "8eirwN1kTwCzgWA2HxTaRQ=="<br></pre>
+  <p>
+    A sample query to get table data using a MAC looks like this:
+  </p>
+  <pre>http://sb.google.com/safebrowsing/update?client=api&amp;apikey=&lt;yourkey&gt;&amp;version=goog-black-
+hash:1:179&amp;wrkey=MTrILkq3LDJtWp8V8zHJaJc2</pre>
+  <p>
+    Below is a sample response including a correct MAC based on the keys
+    provided to the server above.
+  </p>
+  <pre>[goog-black-hash 1.180 update][mac=dRalfTU+bXwUhlk0NCGJtQ==]
++8070465bdf3b9c6ad6a89c32e8162ef1	
++86fa593a025714f89d6bc8c9c5a191ac
++bbbd7247731cbb7ec1b3a5814ed4bc9d</pre>
+   <p><b>*Note that there are tabs at the end of each line.</b></p>
+
+<h1><a name="AcceptableUsage" id="AcceptableUsage"></a>Acceptable Usage in Clients</h1>
+    <p>If this API is used in a client-side application there are some
+    requirements to follow when asking the server for updates.
+	</p>
+  <h2><a name="UpdateBackoff" id="UpdateBackoff"></a>Client Update Frequency and Back-off</h2>
+  <p>
+    The first update request should happen at a random interval between 0-5
+    minutes after the client starts. The second update request should happen
+    between 15-30 minutes later. After that, each update should occur once every
+    25-30 minutes. <b>Be sure that your update
+    request includes the correct last version of the list so that the server can
+    provide incremental updates rather then the entire list</b>.
+  </p>
+  <p>
+    Providing the data on the server for update requires significant resources.
+    To help maintain a high quality of service, it may be necessary for the
+    update server to ask the client to make less frequent requests. To handle
+    this, the client must watch for HTTP timeouts or errors from the server and
+    if too many errors occur, it
+    should increase the time between requests. In particular, if the
+    client receives an error during update, it should try again in one minute.
+    If it receives three errors in a row, it should skip updates until at least
+    60 minutes have passed before trying again. If it then receives another
+    (fourth) error, it should skip updates for the next 180 minutes and if it
+    receives another (fifth) error, it should skip updates for the next 360
+    minutes. It may continue to check once every 360 minutes until the server
+    responds with a success message. Once the server sends a successful HTTP
+    reply, the client should reset it's error counter. If the client has not
+    received a successful response from the server in the last 30 minutes, the
+    client should not show a warning to end-users.
+  </p>
+  <p>
+    The <span style="font-family: Courier New; font-weight: bold;">GetKey</span>
+    request should only be called once per client to establish the secret key.
+    Subsequent
+    <span style="font-family: Courier New; font-weight: bold;">GetKey</span>
+    requests should only be issued in response to a
+    <span style="font-family: Courier New; font-weight: bold;">pleaserekey</span> message.
+  </p>
+<h2><a name="Throttling" id="Throttling"></a>Throttling Clients</h2>
+  <p>
+    If there is a large spike in traffic such that exceeds allocated capacity,
+    clients may be throttled. When a client is throttled, the server will
+    pretend that there are no new updates for some or all of the lists that the
+    client requested. In other words, there is no special protocol for
+    throttling, but a client may receive the data late if it is throttled. In
+    this case, the client will not be able to tell that the data is stale so it
+    may continue to show warnings.
+  </p>
+
+<h2><a name="UserWarnings" id="UserWarnings"></a>End-user visible warnings</h2>
+  <p>If you use the Google Safe
+  Browsing API to warn users about risks from particular webpages, we require
+  that you follow certain guidelines. These guidelines help protect both you and
+  Google from misunderstandings by making clear that the page is not known with
+  100% certainty to be a phishing site or a distributor of malware, and that the
+  warnings merely identify possible risk.
+  </p>
+  <ul>
+    <li>
+      In your end-user visible warning, you may not lead
+      users to believe that the page in question is, without a doubt, a phishing
+      page or a page that distributes malware. When you refer to the page being
+      identified or the potential risks it may pose to users, you must qualify
+      the warning using terms such as: suspected,&nbsp;potentially, possible,
+      likely, may be.
+    </li>
+    <li>
+      Your warning must enable the user to learn more by
+      reviewing information at
+      http://www.antiphishing.org/ (for phishing
+      warnings) or http://www.stopbadware.org/ (for
+      malware warnings).
+    </li>
+    <li>
+      When you show warnings for pages identified as risky by
+      the Safe Browsing API, you must give
+      attribution to Google by including the line
+      "Advisory provided by Google," with a link to
+      http://code.google.com/support/bin/answer.py?answer=70015. 
+      If your product also shows warnings based on other sources, you may not
+      include the Google attribution in warnings derived from non-Google data.
+    </li>
+  </ul>
+
+  <h3>Suggested phishing warning language</h3>
+  <p>We encourage you to just copy this warning language in your product, or modify
+    it slightly to fit your product.
+  </p>
+  <p style="margin-left: 0.5in;">
+    <b>Warning- Suspected phishing page</b>. This page may be a forgery or imitation of another website, designed to
+    trick users into sharing personal or financial information. Entering any
+    personal information on this page may result in identity theft or other
+    abuse. You can find out more about phishing from <a href="http://www.antiphishing.org/">www.antiphishing.org</a>.
+  </p>
+  <p style="margin-left: 0.5in;">
+    <b>Warning- Visiting this web site may harm your
+    computer</b>. This page appears to contain malicious code that could be
+    downloaded to your computer without your consent. You can learn more about harmful web content
+    including viruses and other malicious code and how to protect your computer at 
+	<a href="http://www.stopbadware.org/">StopBadware.org</a>.
+  </p>
+
+<h3>Notice to Users About Phishing and Malware Protection</h3>
+  <p>
+    Our Terms of Service require that if you indicate to users that your service
+    provides malware or phishing protection, you must also let them know that
+    the protection is not perfect. This notice must be visible to them
+    before they enable the protection, and it must let them know that there is a
+    chance of both false positives (safe sites flagged as risky) and false
+    negatives (risky sites not flagged). We suggest using the following
+    language:
+  </p>
+  <p>
+</p><div style="margin-left: 0.5in;">
+    Google works to provide the most accurate and up-to-date phishing and
+    malware information. However, it cannot guarantee that its information is
+    comprehensive and error-free: some risky sites may not be identified, and
+    some safe sites may be identified in error.
+  </div>
+  
+
+<h1><a name="ReportingData" id="ReportingData"></a>Reporting incorrect data</h1>
+  <p>
+    If you would like to help us improve our data, you can submit reports to us.
+    We also encourage you to allow your users to send reports directly to us by
+    including these URLs in your product.
+  </p>
+  <h2><a name="ReportPhishNeg" id="ReportPhishNeg"></a>Report phishing URLs that are not currently on our list</h2>
+    <p><a href="http://www.google.com/safebrowsing/report_phish/?continue=http%3A%2F%2Fwww.google.com%2Ftools%2Ffirefox%2Ftoolbar%2FFT2%2Fintl%2F%3Clang%3E%2Fsubmit_success.html&amp;hl=en">http://www.google.com/safebrowsing/report_phish/?
+continue=http%3A%2F%2Fwww.google.com%2Ftools%2Ffirefox%2Ftoolbar%2FFT2%2Fintl%2F%3Clang%3E%2Fsubmit_success.html&amp;hl=en</a>
+  </p>
+  <h2><a name="ReportPhishPos" id="ReportPhishPos"></a>Report URLs that are currently on our phishing list in error:</h2>
+    <p><a href="http://www.google.com/safebrowsing/report_error/?continue=http%3A%2F%2Fwww.google.com%2Ftools%2Ffirefox%2Ftoolbar%2FFT2%2Fintl%2F%3Clang%3E%2Fsubmit_success.html&amp;hl=en" target="_blank">http://www.google.com/safebrowsing/report_error/?continue=http%3A%2F%2Fwww.google.com%2Ftools%2Ffirefox%
+2Ftoolbar%2FFT2%2Fintl%2F%3Clang%3E%2Fsubmit_success.html&amp;hl=en</a>
+  </p>
+  <h2><a name="ReportMalwareURL" id="ReportMalwareURL"></a>Report malware URLs that are not currently on our malware list</h2>
+    <p><a href="http://www.google.com/safebrowsing/report_badware/" title="http://www.google.com/safebrowsing/report_badware/">http://www.google.com/safebrowsing/report_badware/</a>
+  </p>
+  <h2><a name="ReportMalware" id="ReportMalware"></a>Report URLs that are currently on our malware list in error:</h2>
+    <p><a href="http://www.stopbadware.org/home/reviewinfo" title="http://www.stopbadware.org/home/reviewinfo">http://www.stopbadware.org/home/reviewinfo</a>
+  </p>
+
+<h1><a name="ListFormat" id="ListFormat"></a>List Format</h1>
+  <p>
+    Both <b>goog-black-hash</b> and
+    <b>goog-malware-hash</b> consist of a list of
+    md5 hashes. As mentioned above, the wire format for each list consists
+    of a tab-separated key/value pairs. For these lists the key is the
+    hash and the value is always blank. The hashed values for both lists
+    are suffix/prefix expressions.
+  </p>
+  <br>
+  <h2><a name="SuffixPrefix" id="SuffixPrefix"></a>Suffix/Prefix Expressions</h2>
+  <p>
+    A suffix/prefix expression consists of a host suffix (or full host) and a
+    path prefix (or full path). Note that the path prefix consists of full
+    path components, not partial path components.</p>
+    <p>Examples:</p>
+	<table>
+	<tbody><tr>
+	 <td>Regular expression:</td>
+	 <td><span style="font-family: Courier New;">http\:\/\/.*\.a\.b\/mypath\/.*</span></td>
+	</tr>
+	<tr>
+	 <td>Suffix/Prefix expression:</td>
+	 <td><span style="font-family: Courier New;">a.b/mypath/</span></td>
+	</tr>
+	<tr>
+	 <td>Regular expression:</td>
+	 <td><span style="font-family: Courier New;">http\:\/\/.*.c\.d\/full\/path\.html</span></td>
+	</tr>
+	<tr>
+	 <td>Suffix/Prefix expression:</td>
+	 <td><span style="font-family: Courier New;">c.d/full/path.html</span></td>
+	</tr>
+	</tbody></table>
+
+  <h2><a name="PerformingLookups" id="PerformingLookups"></a>Performing Lookups</h2>
+  <p>
+  Currently all valid list types rely on suffix/prefix expressions, as described
+  above. To perform a lookup for a given URL, the client will try to form
+  different possible host suffix and path prefix combinations and see if they
+  match each list. For these lookups, only the host and path components of
+  the URL are used. The scheme, username, password, and port are
+  disregarded. If query parameters are present in the URL, the client will
+  also include a lookup with the full path and query
+  parameters.
+  </p>
+  <p>
+  For the hostname, the client will try at most 5 different strings. They are:
+  </p><ul>
+    <li>
+      the exact hostname in the URL
+    </li>
+    <li>
+      up to 4 hostnames formed by starting with the last 5 components and
+      successively removing the leading component. The top-level domain can be
+      skipped.
+    </li>
+  </ul>
+  
+  <p>
+  For the path, the client will also try at most 6 different strings. They are:</p>
+  <ul>
+    <li>
+      the exact path of the url, including query parameters<br>
+    </li>
+    <li>
+      the exact path of the url, without query parameters
+    </li>
+    <li>
+      the 4 paths formed by starting at the root (/) and successively appending
+      path components, including a trailing slash.
+    </li>
+  </ul>
+  
+  <p>
+  The following examples should help illustrate the lookup behavior:</p>
+  <p>
+  For the url <span style="font-family: Courier New;">http://a.b.c/1/2.html,
+  <span style="font-family: Verdana;">the client will try these possible
+  strings:</span></span><br>
+  </p><div style="margin-left: 0.5in;">
+    <span style="font-family: Courier New;">a.b.c/1/2.html?param=1<br>
+    </span><span style="font-family: Courier New;">a.b.c/1/2.html</span><br>
+    <span style="font-family: Courier New;"> a.b.c/<br>
+    a.b.c/1/<br>
+    b.c/1/2.html?param=1<br>
+    </span><span style="font-family: Courier New;"> b.c/1/2.html</span><br>
+    <span style="font-family: Courier New;"> b.c/<br>
+    b.c/1/<br>
+    </span>
+  </div>
+  <span style="font-family: Courier New;"></span><br>
+  <p>For the url
+  <span style="font-family: Courier New;">http://a.b.c.d.e.f.g/1.html</span>, the client will try these possible
+  strings:
+  </p><div style="margin-left: 0.5in; font-family: Courier New;">
+    a.b.c.d.e.f.g/1.html
+  </div>
+  <div style="margin-left: 0.5in; font-family: Courier New;">
+    a.b.c.d.e.f.g/
+  </div>
+  <div style="margin-left: 0.5in; font-family: Courier New;">
+    c.d.e.f.g/1.html
+  </div>
+  <div style="margin-left: 0.5in; font-family: Courier New;">
+    c.d.e.f.g/
+  </div>
+  <div style="margin-left: 0.5in; font-family: Courier New;">
+    d.e.f.g/1.html
+  </div>
+  <div style="margin-left: 0.5in; font-family: Courier New;">
+    d.e.f.g/
+  </div>
+  <div style="margin-left: 0.5in; font-family: Courier New;">
+    e.f.g/1.html
+  </div>
+  <div style="margin-left: 0.5in; font-family: Courier New;">
+    e.f.g/
+  </div>
+  <div style="margin-left: 0.5in; font-family: Courier New;">
+    f.g/1.html
+  </div>
+  <div style="margin-left: 0.5in; font-family: Courier New;">
+    f.g/
+  </div>
+  <div style="margin-left: 0.5in; font-family: Courier New;">
+    *(Note that b.c.d.e.f.g, is skipped since we'll take only the last 5 hostname
+    components, and the full
+    hostname)
+  </div>
+
+   <h2><a name="Canonicalization" id="Canonicalization"></a>Canonicalization</h2>
+    <p>Before lookup in any list, the URL must be canonicalized.</p>
+    <p>
+    We assume that the client has parsed the URL and made it valid according to
+    RFC 2396. If it's an international URL, use the ASCII punycode
+    representation. The URL must include a path component, e.g.
+    'http://google.com/' must have a trailing slash.</p>
+    <p>
+	To start, repeatedly URL-unescape the URL until it has no more
+    hex-encodings.
+    </p>
+  <p>
+    To canonicalize the hostname, extract the hostname from the URL and then follow these steps:
+  </p>
+  <ul>
+    <li>
+      Remove all leading and trailing dots<br>
+    </li>
+    <li>
+      Replace consecutive dots with a single dot.
+    </li>
+    <li>
+      If the hostname can be parsed as an IP address, it should be normalized to
+      4 dot-separated decimal values. The client should handle any legal IP
+      address encoding, including octal, hex, and fewer than 4 components.<br>
+    </li>
+    <li>
+      Lowercase the whole string.
+    </li>
+  </ul>
+  <p>
+  To canonicalize the path:</p>
+  <ul>
+    <li>
+      The sequences "/../" and "/./" in the path should be resolved, by
+      replacing "/./" with "/", and removing "/../" along with the preceding
+      path component.
+    </li>
+    <li>
+      Runs of consecutive slashes should be replaced with a single slash
+      character.<br>
+    </li>
+  </ul>
+  <p>
+  After performing these steps, percent-escape all characters in the URL which
+  are &lt;= ASCII 32, &gt;= 127, or "%". The escapes should use uppercase
+  hex characters.</p>
+
+
+    
+
+
+
+
+
+</div> 
+
+<div id="footer" dir="ltr">
+  
+  <div class="text">
+  
+    ©2007 Google -
+    <a href="http://www.google.com/">Google Home</a> -
+    <a href="http://www.google.com/jobs/">We're Hiring</a> -
+    <a href="http://code.google.com/apis/safebrowsing/terms.html">Terms of Service</a> -
+    <a href="http://www.google.com/privacy.html">Privacy Policy</a> -
+    <a href="http://groups.google.com/group/google-safe-browsing-api">Discussion Group</a>
+  
+  </div>
+</div>
+
+<script style="display: none;" src="developers_guide_files/urchin.js" type="text/javascript">
+</script>
+
+
+<script type="text/javascript">
+  _uacct="UA-18071-1"; // code.google.com site-wide tracking
+  _uanchor=1;
+  _uff=0;
+  urchinTracker();
+</script>
+
+
+  </body></html>
