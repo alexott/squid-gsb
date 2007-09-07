@@ -1,0 +1,28 @@
+syntax: glob
+*.orig
+*.rej
+*~
+.svn
+Makefile.in
+Makefile
+aclocal.m4
+autom4te.cache
+config.h.in
+configure
+depcomp
+install-sh
+missing
+config.h
+config.log
+config.status
+.deps
+test-ldap
+*.o
+stamp-h1
+wfilter.hpp
+
+syntax: regexp
+.*\#.*\#$
+
+
+
