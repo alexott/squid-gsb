@@ -20,6 +20,9 @@ test-ldap
 *.o
 stamp-h1
 wfilter.hpp
+src/gsb-redirector
+src/test.dat
+src/tests
 
 syntax: regexp
 .*\#.*\#$
