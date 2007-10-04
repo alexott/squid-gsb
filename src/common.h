@@ -26,6 +26,7 @@ namespace fs = boost::filesystem;
 struct HashData {
 	int majorVersion;
 	int minorVersion;
+	std::string name;
 	
 	typedef std::set<std::string> HashSet;
 	HashSet hashes;
@@ -35,9 +36,10 @@ struct HashData {
 	template<class Archive> void serialize(Archive & ar, const unsigned int version) {
         ar & majorVersion;
         ar & minorVersion;
+		ar & name;
         ar & hashes;
     }
-    HashData() : majorVersion(0), minorVersion(0) { }
+    HashData() : majorVersion(1), minorVersion(-1) { }
 	
 } ;
 BOOST_CLASS_TRACKING(HashData, boost::serialization::track_never)
