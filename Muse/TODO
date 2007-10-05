@@ -1,0 +1,8 @@
+;; -*- mode: muse -*-
+
+ - use url parser from cpp-netlib sandbox ?
+ - rewrite redirector to work in loop, with fallbacks checking, as described in goole
+   documentation 
+ - add configuration files with different parameters
+ - write simple .cgi scripts in sh, to call them in rewtitten url's? or better to use
+   static html?

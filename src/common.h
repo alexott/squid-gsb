@@ -13,7 +13,7 @@
 #include <set>
 #include <string>
 #include <fstream>
-#include <vector>
+#include <deque>
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
@@ -22,6 +22,8 @@
 
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
+
+#include <boost/lexical_cast.hpp>
 
 struct HashData {
 	int majorVersion;
@@ -44,7 +46,7 @@ struct HashData {
 } ;
 BOOST_CLASS_TRACKING(HashData, boost::serialization::track_never)
 
-typedef std::vector<std::string> StringVector;
+typedef std::deque<std::string> StringVector;
 
 
 #endif /* _COMMON_H */

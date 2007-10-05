@@ -8,7 +8,6 @@
  */
 
 #include "common.h"
-#include <boost/lexical_cast.hpp>
 #include <boost/asio.hpp>
 #include <boost/regex.hpp>
 #include <iostream>
