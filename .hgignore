@@ -21,8 +21,11 @@ test-ldap
 stamp-h1
 wfilter.hpp
 src/gsb-redirector
-src/test.dat
+src/*.dat
 src/tests
+src/*.log
+src/gsb-updater
+
 
 syntax: regexp
 .*\#.*\#$
