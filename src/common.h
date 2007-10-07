@@ -24,6 +24,7 @@
 namespace fs = boost::filesystem;
 
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 
 struct HashData {
 	int majorVersion;

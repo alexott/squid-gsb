@@ -9,7 +9,6 @@
 
 #include "common.h"
 #include <iostream>
-#include <boost/algorithm/string.hpp>
 #include <boost/md5.hpp>
 
 #include<boost/tokenizer.hpp>

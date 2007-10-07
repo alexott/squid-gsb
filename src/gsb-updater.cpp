@@ -76,9 +76,6 @@ bool readData(HashData& h, std::istream& is) {
 			return false;
 		}
 		if(m[4].str() != " update") {
-#ifdef DEBUG
-			std::cerr << "Full update of hash" << std::endl;
-#endif
 			h.hashes.clear();
 		}
 		h.majorVersion=boost::lexical_cast<int>(m[2].str());
@@ -97,22 +94,12 @@ bool readData(HashData& h, std::istream& is) {
 				}
 				if(boost::regex_search(ts, m, sr, boost::match_extra)){
 					if(m[1].str() == "+") {
-#ifdef DEBUG
-						std::cerr << "Add hash " << m[2].str() << std::endl;
-#endif
 						h.hashes.insert(m[2].str());
 					} else if (m[1].str() == "-") {
-#ifdef DEBUG
-						std::cerr << "Remove hash " << m[2].str() << std::endl;
-#endif
 					    if((hi=h.hashes.find(m[2].str())) != h.hashes.end()) {
 							h.hashes.erase(hi);
 						}
 					} else {
-#ifdef DEBUG
-						std::cerr << "Unknown first symbol " << m[1].str() << " "
-								  << m[2].str() << std::endl;
-#endif
 					}
 				} else {
 #ifdef DEBUG
@@ -161,6 +148,8 @@ bool updateHash(HashData& h) {
 		boost::regex sr("HTTP/\\d\\.\\d (\\d+) \\S+");
 		std::string ts;
 		boost::smatch m;
+		const std::string cls("Content-Length: ");
+		const int clsl=16;
 
 		std::getline(s,ts);
 #ifdef DEBUG
@@ -179,7 +168,8 @@ bool updateHash(HashData& h) {
 #endif
 			return false;
 		}
-		
+
+		int cl=-1;
 		while(true) {
 			std::getline(s,ts);
 			std::cerr << ts << std::endl;
@@ -192,9 +182,12 @@ bool updateHash(HashData& h) {
 			if (ts == "" || ts == "\r") {
 				break;
 			}
+			if(boost::istarts_with(ts,cls)) {
+				cl=boost::lexical_cast<int>(ts.substr(clsl));
+			}
 		}
-			
-		result=readData(h,s);
+		if(cl != 0)
+			result=readData(h,s);
 	} catch(std::exception& x) {
 #ifdef DEBUG
 		std::cerr << "Catch exception: " << x.what() << std::endl;
