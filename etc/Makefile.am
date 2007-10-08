@@ -12,11 +12,11 @@ install-data-local:
 	for l in $(FLISTS) ; do \
 		if [ -f $(DESTDIR)$(DATATOPDIR)/$$l ] ; then \
 			echo "$(INSTALL_DATA) $$l $(DESTDIR)$(DATATOPDIR)/$$l.new"; \
-			$(INSTALL_DATA) $$l $(DESTDIR)$(DATATOPDIR)/$$l.new; \
+			$(INSTALL_DATA) $$l $(DESTDIR)$(DATATOPDIR)/$$l.new ; \
 	  else \
 			echo "$(INSTALL_DATA) $$l $(DESTDIR)$(DATATOPDIR)/$$l"; \
 			$(INSTALL_DATA) $$l $(DESTDIR)$(DATATOPDIR)/$$l; \
-		endif
+		fi \
 	done 
 
 uninstall-local:
