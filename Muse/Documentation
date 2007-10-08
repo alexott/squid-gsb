@@ -40,6 +40,7 @@ PREFIX/etc/squid-gsb.conf):
   - malware-hash-file -- file where malware hash is stored. Default value =
     PREFIX/var/squid-gsb/malware-hash.dat 
   - malware-url (required) -- URL, that will substituted for sites, found in malware list 
-  - key (required) -- key for connecting to Google Safe Browsing API and perform updates
+  - key (required) -- key for connecting to Google Safe Browsing API and perform updates.
+    You can obtain it from [[http://code.google.com/apis/safebrowsing/][Google Safe Browsing API]] page
   - debug -- specify - should we print debug information to stderr. Default value - no.
 
