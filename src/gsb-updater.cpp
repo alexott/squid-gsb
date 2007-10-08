@@ -14,6 +14,15 @@
 
 namespace ba=boost::asio;
 
+bool runDebug;
+std::string key;
+
+/** 
+ * read hash from a given file
+ * 
+ * @param fname file name
+ * @param h hash to read
+ */
 void readIfExists(const fs::path& fname,HashData& h) {
 	if(fs::exists(fname)) {
 		std::ifstream ifs(fname.file_string().c_str(), std::ios::binary);
@@ -21,22 +30,28 @@ void readIfExists(const fs::path& fname,HashData& h) {
 			boost::archive::text_iarchive ia(ifs);
 			ia >> h;
 		} else {
-#ifdef DEBUG
-			std::cerr << "Error opening " << fname << std::endl;
-#endif
+			if(runDebug)
+				std::cerr << "Error opening " << fname << std::endl;
+
 			return;
 		}
 	}
 }
 
+/** 
+ * Write given hash to file
+ * 
+ * @param fname filename
+ * @param h hash file
+ */
 void writeHash(const fs::path& fname,HashData& h) {
 	try {
 		fs::path tname=fname.file_string() + ".tmp";
 		std::ofstream ofs(tname.file_string().c_str(), std::ios::binary);
 		if (!ofs) {
-#ifdef DEBUG
-			std::cerr << "Error opening " << tname << std::endl;
-#endif
+			if(runDebug)
+				std::cerr << "Error opening " << tname << std::endl;
+
 			return ;
 		}
 		boost::archive::text_oarchive oa(ofs);
@@ -44,17 +59,17 @@ void writeHash(const fs::path& fname,HashData& h) {
 		ofs.close();
 		if(fs::exists(fname)){
 			if (!fs::remove(fname)) {
-#ifdef DEBUG
-				std::cerr << "Error removing " << fname << std::endl;
-#endif
+				if(runDebug)
+					std::cerr << "Error removing " << fname << std::endl;
+
 				return ;
 			}
 		}
 		fs::rename(tname,fname);
 	} catch(std::exception& x) {
-#ifdef DEBUG
-		std::cerr << "Catch exception: " << x.what() << std::endl;
-#endif
+		if(runDebug)
+			std::cerr << "Catch exception: " << x.what() << std::endl;
+
 	}
 	
 }
@@ -67,12 +82,14 @@ bool readData(HashData& h, std::istream& is) {
 	boost::regex hr("\\[(\\S+) (\\d)\\.(\\d+)( update)?\\]");
 
 	if(boost::regex_search(ts, m, hr, boost::match_extra)){
-		std::cerr << m[1].str() << " " << m[2].str() << " " << m[3].str() << std::endl;
+		if(runDebug)
+			std::cerr << m[1].str() << " " << m[2].str() << " " << m[3].str() << std::endl;
+		
 		if(m[1].str() != h.name) {
-#ifdef DEBUG
-			std::cerr << "Wrong name of hash \"" << m[1].str() <<
-				"\" instead of " <<h.name << std::endl;
-#endif
+			if(runDebug)
+				std::cerr << "Wrong name of hash \"" << m[1].str() <<
+					"\" instead of " <<h.name << std::endl;
+
 			return false;
 		}
 		if(m[4].str() != " update") {
@@ -87,9 +104,6 @@ bool readData(HashData& h, std::istream& is) {
 			try {
 				std::getline(is,ts);
 				if (is.eof() || is.fail() || ts == "") {
-#ifdef DEBUG
-					std::cerr << "End of stream" << std::endl;
-#endif
 					break;
 				}
 				if(boost::regex_search(ts, m, sr, boost::match_extra)){
@@ -102,40 +116,45 @@ bool readData(HashData& h, std::istream& is) {
 					} else {
 					}
 				} else {
-#ifdef DEBUG
-					std::cerr << "String not matched" << std::endl;
-#endif
+					if(runDebug)
+						std::cerr << "String not matched" << std::endl;
+
 				}
 			} catch (std::exception& x) {
-#ifdef DEBUG
-				std::cerr << "Catch exception: " << x.what() << std::endl;
-#endif
+				if(runDebug)
+					std::cerr << "Catch exception: " << x.what() << std::endl;
+
 			}
 		}
 		
 			
 	} else {
-#ifdef DEBUG
-		std::cerr << "First line not matched" << std::endl;
-#endif
+		if(runDebug)
+			std::cerr << "First line not matched" << std::endl;
+
 	    return false;
 	}
 	
 	return true;
 }
 
-
+/** 
+ * Update given hash file
+ * 
+ * @param h referense to hash file
+ * 
+ * @return true on successfull update
+ */
 bool updateHash(HashData& h) {
 	bool result=false;
 	try {
 		std::string host("sb.google.com");
-		std::string key("ABQIAAAAABwg5aWV0j9eN6t-GBI64hTicPALuOOU0tufrSiosNnEET78Og");
 		
 		ba::ip::tcp::iostream s(host.c_str(), "http");
 		if(!s) {
-#ifdef DEBUG
-			std::cerr << "Error opening stream to " << host << std::endl;
-#endif
+			if(runDebug)
+				std::cerr << "Error opening stream to " << host << std::endl;
+
 			return false;
 		}
 		
@@ -152,31 +171,33 @@ bool updateHash(HashData& h) {
 		const int clsl=16;
 
 		std::getline(s,ts);
-#ifdef DEBUG
-		std::cerr << ts << std::endl;
-#endif
-		
+		if(runDebug)
+			std::cerr << ts << std::endl;
+
 		if(!boost::regex_search(ts, m, sr, boost::match_extra)){
-#ifdef DEBUG
-			std::cerr << "Bad response string: " << ts << std::endl;
-#endif
+			if(runDebug)
+				std::cerr << "Bad response string: " << ts << std::endl;
+
 			return false;
 		}
 		if(m[1].str() != "200") {
-#ifdef DEBUG
-			std::cerr << "Non-successfull answer: " << m[1].str() << std::endl;
-#endif
+			if(runDebug)
+				std::cerr << "Non-successfull answer: " << m[1].str() << std::endl;
+
 			return false;
 		}
 
 		int cl=-1;
 		while(true) {
 			std::getline(s,ts);
-			std::cerr << ts << std::endl;
+			boost::trim(ts);
+			if(runDebug)
+				std::cerr << ts << std::endl;
+ 
 			if (s.eof() || s.fail()) {
-#ifdef DEBUG
-				std::cerr << "End of stream" << std::endl;
-#endif
+				if(runDebug)
+					std::cerr << "End of stream" << std::endl;
+
 				return false;
 			}
 			if (ts == "" || ts == "\r") {
@@ -189,9 +210,9 @@ bool updateHash(HashData& h) {
 		if(cl != 0)
 			result=readData(h,s);
 	} catch(std::exception& x) {
-#ifdef DEBUG
-		std::cerr << "Catch exception: " << x.what() << std::endl;
-#endif
+		if(runDebug)
+			std::cerr << "Catch exception: " << x.what() << std::endl;
+
 	}
 
 	return result;
@@ -199,7 +220,21 @@ bool updateHash(HashData& h) {
 
 
 int main(int argc, char** argv) {
-	fs::path bhFileName("black-hash.dat"),mhFileName("malware-hash.dat");
+	po::variables_map cfg;
+	if(!parseOptions(argc,argv,cfg))
+		return 0;
+
+	fs::path bhFileName,mhFileName;
+	try {
+		runDebug=cfg["debug"].as<bool>();
+		bhFileName=cfg["black-hash-file"].as<std::string>();
+		mhFileName=cfg["malware-hash-file"].as<std::string>();
+		key=cfg["key"].as<std::string>();
+	} catch (...) {
+		std::cerr << "Please check configuration file!" << std::endl;
+		return 1;
+	}
+
 	
 	HashData bh;
 	bh.name="goog-black-hash";
@@ -209,17 +244,23 @@ int main(int argc, char** argv) {
  	mh.name="goog-malware-hash";
  	readIfExists(mhFileName,mh);
 
-	
+	int mnv, mjv;
+	mjv=bh.majorVersion;
+	mnv=bh.minorVersion;
 	if(updateHash(bh)) {
-#ifdef DEBUG
-		std::cerr << "Black hash updated" << std::endl;
-#endif
+		std::cerr << "Black hash updated from " << mjv << "." << mnv
+				  << " to " << bh.majorVersion << "." << bh.minorVersion
+				  << std::endl;
+
 		writeHash(bhFileName,bh);
 	}
+	mjv=mh.majorVersion;
+	mnv=mh.minorVersion;
 	if(updateHash(mh)) {
-#ifdef DEBUG
-		std::cerr << "Malware hash updated" << std::endl;
-#endif
+		std::cerr << "Malware hash updated from " << mjv << "." << mnv
+				  << " to " << mh.majorVersion << "." << mh.minorVersion
+				  << std::endl;
+
 		writeHash(mhFileName,mh);
 	}
 	

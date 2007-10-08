@@ -1,10 +1,10 @@
 ;; -*- mode: muse -*-
 
- - add to updater check for Content-Length == 0
+ - DONE: add to updater check for Content-Length == 0
  - use url parser from cpp-netlib sandbox ?
- - rewrite redirector to work in loop, with fallbacks checking, as described in goole
+ - rewrite updater to work in loop, with fallbacks checking, as described in goole
    documentation 
- - add configuration files with different parameters
- - write simple .cgi scripts in sh, to call them in rewtitten url's? or better to use
+ - DONE add configuration files with different parameters
+ - DONE write simple .cgi scripts in sh, to call them in rewtitten url's? or better to use
    static html?
- - write documentation
+ - DONE write documentation

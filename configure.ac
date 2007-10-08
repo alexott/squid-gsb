@@ -47,10 +47,16 @@ AC_ARG_WITH(boost-libs,
   LDFLAGS="-I${withval} ${LDFLAGS}"
 fi])
 
-
+AC_FINALIZE_VAR(CONFDIR,"${sysconfdir}")
+AC_SUBST(CONFDIR)
+AC_FINALIZE_VAR(LSTATEDIR,"${localstatedir}/${PACKAGE_NAME}")
+AC_SUBST(LSTATEDIR)
 
 AC_CONFIG_FILES([Makefile 
                  src/Makefile
+                 src/gsb-conf.h
+                 etc/Makefile
+                 etc/squid-gsb.conf
 	])
 AC_OUTPUT
 

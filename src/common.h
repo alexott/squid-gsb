@@ -26,6 +26,9 @@ namespace fs = boost::filesystem;
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include <boost/program_options.hpp>
+namespace po = boost::program_options;
+
 struct HashData {
 	int majorVersion;
 	int minorVersion;
@@ -49,6 +52,7 @@ BOOST_CLASS_TRACKING(HashData, boost::serialization::track_never)
 
 typedef std::deque<std::string> StringVector;
 
+bool parseOptions(int argc, char** argv, po::variables_map& cfg);
 
 #endif /* _COMMON_H */
 

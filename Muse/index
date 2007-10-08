@@ -4,11 +4,7 @@
 
 This is project implement squid redirector for [[http://code.google.com/apis/safebrowsing/][Google Safe Browsing API]].  
 
-My key for access is "ABQIAAAAABwg5aWV0j9eN6t-GBI64hTicPALuOOU0tufrSiosNnEET78Og"
-
 [[Documentation]]
-
-[[HowItWorks][How it works]]
 
 [[DataForTests][Data for tests]]
 

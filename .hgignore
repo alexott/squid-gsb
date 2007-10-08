@@ -25,7 +25,9 @@ src/*.dat
 src/tests
 src/*.log
 src/gsb-updater
-
+src/*.conf
+etc/*.conf
+src/gsb-conf.h
 
 syntax: regexp
 .*\#.*\#$

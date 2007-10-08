@@ -14,6 +14,7 @@
 #include<boost/tokenizer.hpp>
 typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
+bool runDebug;
 
 struct HashFile {
 	HashData h;
@@ -29,24 +30,24 @@ struct HashFile {
 		std::time_t nt;
 		if(fs::exists(fname)) {
 			if(wtime < (nt=last_write_time(fname))) {
-#ifdef DEBUG
-				std::cerr << "Going to read " << fname.file_string() << std::endl;
-#endif
+				if(runDebug)
+					std::cerr << "Going to read " << fname.file_string() << std::endl;
+
 				std::ifstream ifs(fname.file_string().c_str(), std::ios::binary);
 				if(!ifs) {
-#ifdef DEBUG
-					std::cerr << "Error opening " << fname << std::endl;
-#endif
+					if(runDebug)
+						std::cerr << "Error opening " << fname << std::endl;
+
 					return;
 				}
 				boost::archive::text_iarchive ia(ifs);
 				ia >> h;
 				wtime=nt;
 			}
-#ifdef DEBUG
 		} else {
-			std::cerr << fname <<  " doesn't exists" << std::endl;
-#endif
+			if(runDebug)
+				std::cerr << fname <<  " doesn't exists" << std::endl;
+			
 		}
 	}
 	
@@ -69,10 +70,10 @@ struct HashFile {
 		HashData::HashSet::iterator hi;
 		for(; it != itEnd; ++it) {
 			if ((hi=h.hashes.find(*it)) != h.hashes.end()) {
-#ifdef DEBUG
-			    std::cerr << "Found match in " << h.name
-						  << ": " << *it << std::endl;
-#endif
+				if(runDebug)
+					std::cerr << "Found match in " << h.name
+							  << ": " << *it << std::endl;
+
 				u=url;
 				return true;
 			}
@@ -156,9 +157,9 @@ bool generateVariants(const std::string& url, StringVector& sv) {
 	std::string t, tm, host, path(""),query("");
  	std::string::size_type idx;
 	if(!boost::istarts_with(url,"http://")){
-#ifdef DEBUG
-		std::cerr << "Not http protocol: " << url << std::endl;
-#endif
+		if(runDebug)
+			std::cerr << "Not http protocol: " << url << std::endl;
+
 		return false;
 	}
 	t=url.substr(7);
@@ -193,9 +194,9 @@ bool generateVariants(const std::string& url, StringVector& sv) {
 		boost::md5 m(it->begin(),it->end());
 		tm=boost::lexical_cast<std::string>(m);
 		sv.push_back(tm);
-#ifdef DEBUG
-		std::cerr << "hash for " << *it << " = " << tm  << std::endl;
-#endif
+		if(runDebug)
+			std::cerr << "hash for " << *it << " = " << tm  << std::endl;
+
 	}
 
 	return sv.size() > 0;
@@ -205,15 +206,22 @@ bool generateVariants(const std::string& url, StringVector& sv) {
 
 int main(int argc, char** argv) {
 	//read settings
+	po::variables_map cfg;
+	if(!parseOptions(argc,argv,cfg))
+		return 1;
 
-	//
 	HashFile bh;
-	bh.fname="black-hash.dat";
-	bh.url="black hash url";
-	
 	HashFile mh;
-	mh.fname="malware-hash.dat";
-	mh.url="malware hash url";
+	try {
+		runDebug=cfg["debug"].as<bool>();
+		bh.fname=cfg["black-hash-file"].as<std::string>();
+		bh.url=cfg["black-url"].as<std::string>();
+		mh.fname=cfg["malware-hash-file"].as<std::string>();
+		mh.url=cfg["malware-url"].as<std::string>();
+	} catch (...) {
+		std::cerr << "Please check configuration file!" << std::endl;
+		return 1;
+	}
 
 	std::string url;
 	StringVector sv;
@@ -221,9 +229,10 @@ int main(int argc, char** argv) {
 	int count=MaxCount;
 	while(true) {
 		std::getline(std::cin,url);
-#ifdef DEBUG
-		std::cerr << "get " << url << " from std::cin" << std::endl;
-#endif
+		boost::trim(url);
+		if(runDebug)
+			std::cerr << "get " << url << " from std::cin" << std::endl;
+
 		if(count >= MaxCount) {
 			mh.updateHash();
 			bh.updateHash();
