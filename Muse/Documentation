@@ -5,22 +5,27 @@
 This system provide support for Google Safe Browsing API in Squid.  It works as Squid
 redirector, and installed according the documentation for squid's redirectors.
 
+** How to obtain it
+
+This software is available in source form from [[http://xtalk.msk.su/~ott/common/cf/squid-gsb-0.1.tar.gz][my site]].
+
 ** How to build
 
 To build you need to obtain development snapshot of [[http://www.boost.org][Boost]] 1.35 or use Boost 1.34 with
-boost::asio from http://asio.sf.net
+boost::asio from http://asio.sf.net. To compile project from scratch you need to run
+'bootstrap.sh' script and then run 'configure' to configure package.  If Boost is
+installed in non-standard place, you could use --with-boost-includes & --with-boost-libs
+options to specify where located include files and libs for Boost.
 
-To compile project from scratch you need to run 'bootstrap.sh' script and then run
-'configure' to configure package.  If Boost is installed in non-standard place, you could
-use --with-boost-includes & --with-boost-libs options to specify where located include
-files and libs for Boost.
+It was successfully tested on Linux with kernel 2.6 (Ubuntu) and Mac OS X Tiger (10.4) on
+iMac.  Teoretically it should be compilable also on MS Windows, but i hadn't tried yet.
 
 ** How to run
 
 This system consiste from two utilities: updater (gsb-updater) & checker (gsb-redirector).
 Bot utilities accepts the same command-line options and use same configuration file.  Most
 important option -- '-c', specify where configuration file is located, by default used
-file squid-gsb.conf in current directory. 
+file PREFIX/etc/squid-gsb.conf. 
 
 Updater should run periodically (once per half hour via cron, for example) and will
 connect to the google and update hashes.
