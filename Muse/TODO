@@ -4,6 +4,7 @@
  - rewrite updater to work in loop, with fallbacks checking, as described in goole
    documentation 
  - port to CMake to allow compilation under windows
+ - properly rewrite pathes with /aaa/../../bbb & /aa/./bb
  - drop most of boost parts?
  - DONE add configuration files with different parameters
  - DONE write simple .cgi scripts in sh, to call them in rewtitten url's? or better to use
