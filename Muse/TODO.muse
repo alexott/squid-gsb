@@ -1,4 +1,3 @@
-;; -*- mode: muse -*-
 
  - use url parser from cpp-netlib sandbox ?
  - rewrite updater to work in loop, with fallbacks checking, as described in goole

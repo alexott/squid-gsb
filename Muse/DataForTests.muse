@@ -1,6 +1,4 @@
-;; -*- mode: muse -*-
-
-* Data for tests
+#title Data for tests
 
 http://www.howwater.com/  -> da496e96679f98870c00054673a41df4
 

@@ -1,0 +1,9 @@
+#title Support Google Safe Browsing API in Squid
+
+This is project implement squid redirector for [[http://code.google.com/apis/safebrowsing/][Google Safe Browsing API]].  
+
+[[Documentation.muse][Documentation]]
+
+[[DataForTests.muse][Data for tests]]
+
+[[TODO.muse][TODO items]]
