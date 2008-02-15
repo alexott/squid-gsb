@@ -2,8 +2,8 @@
 
 This is project implement squid redirector for [[http://code.google.com/apis/safebrowsing/][Google Safe Browsing API]].  
 
-[[Documentation.muse][Documentation]]
+[[Documentation][Documentation]]
 
-[[DataForTests.muse][Data for tests]]
+[[DataForTests][Data for tests]]
 
-[[TODO.muse][TODO items]]
+[[TODO][TODO items]]
