@@ -1,4 +1,3 @@
-syntax: glob
 *.orig
 *.rej
 *~
@@ -29,8 +28,6 @@ src/*.conf
 etc/*.conf
 src/gsb-conf.h
 
-syntax: regexp
-.*\#.*\#$
 
 
 
