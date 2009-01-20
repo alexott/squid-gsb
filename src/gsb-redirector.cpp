@@ -1,10 +1,10 @@
 /**
  * @file   gsb-redirector.cpp
  * @author Alex Ott <alexott@gmail.com>
- * 
- * @brief  
- * 
- * 
+ *
+ * @brief
+ *
+ *
  */
 
 #include "common.h"
@@ -22,9 +22,9 @@ struct HashFile {
 	std::string url;
 	std::time_t wtime;
 
-	/** 
+	/**
 	 * Update file with hash, using last update time of file
-	 * 
+	 *
 	 */
 	void updateHash() {
 		std::time_t nt;
@@ -47,24 +47,24 @@ struct HashFile {
 		} else {
 			if(runDebug)
 				std::cerr << fname <<  " doesn't exists" << std::endl;
-			
+
 		}
 	}
-	
+
 	HashFile(): fname(""), url(""), wtime(0) { }
 
-	/** 
+	/**
 	 * Check is url in hash?
-	 * 
+	 *
 	 * @param sv list of generated url's
 	 * @param u new url, that will updated if match found
-	 * 
+	 *
 	 * @return if one of url's found in hash
 	 */
 	bool checkHash(StringVector& sv, std::string& u) {
 		if(h.minorVersion == -1)
 			return false;
-		
+
 		StringVector::iterator it=sv.begin();
 		StringVector::iterator itEnd=sv.end();
 		HashData::HashSet::iterator hi;
@@ -80,14 +80,14 @@ struct HashFile {
 		}
 		return false;
 	}
-	
+
 } ;
 
-/** 
- * 
- * 
- * @param host 
- * @param hv 
+/**
+ *
+ *
+ * @param host
+ * @param hv
  */
 void generateHostVariants(const std::string& host, StringVector& hv) {
 	StringVector tsl;
@@ -110,11 +110,11 @@ void generateHostVariants(const std::string& host, StringVector& hv) {
 	}
 }
 
-/** 
- * 
- * 
- * @param path 
- * @param pv 
+/**
+ *
+ *
+ * @param path
+ * @param pv
  */
 void generatePathVariants(const std::string& path, StringVector& pv) {
 	StringVector tsl;
@@ -140,20 +140,20 @@ void generatePathVariants(const std::string& path, StringVector& pv) {
 	}
 }
 
-/** 
+/**
  * Generate list of MD5 hashes
  *
  * TODO: use url parser from cpp-netlib?
  *
- * @param url 
- * @param sv 
- * 
+ * @param url
+ * @param sv
+ *
  * @return true, if success, false - if no variants generated
  */
 bool generateVariants(const std::string& url, StringVector& sv) {
 	sv.clear();
 	StringVector tv, hv, pv;
-	
+
 	std::string t, tm, host, path(""),query("");
  	std::string::size_type idx;
 	if(!boost::istarts_with(url,"http://")){
@@ -178,7 +178,7 @@ bool generateVariants(const std::string& url, StringVector& sv) {
 	// generate additional variants for host & pathes
 	generateHostVariants(host,hv);
 	generatePathVariants(path,pv);
-	
+
 	for(StringVector::iterator hi=hv.begin(); hi != hv.end(); ++hi) {
 		tv.push_back(*hi+"/");
 		if(pv.size()>0 && query != "")
@@ -187,7 +187,7 @@ bool generateVariants(const std::string& url, StringVector& sv) {
 			tv.push_back(*hi+*pi);
 		}
 	}
-		
+
 	StringVector::iterator it=tv.begin();
 	StringVector::iterator itEnd=tv.end();
 	for(; it != itEnd; ++it) {
@@ -237,7 +237,7 @@ int main(int argc, char** argv) {
 			mh.updateHash();
 			bh.updateHash();
 		}
-		if(bh.h.minorVersion == -1 && mh.h.minorVersion == -1) { 
+		if(bh.h.minorVersion == -1 && mh.h.minorVersion == -1) {
 			std::cout << "" << std::endl;
 			continue;
 		}

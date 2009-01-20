@@ -1,10 +1,10 @@
 /**
  * @file   common.h
  * @author Alex Ott <alexott@gmail.com>
- * 
+ *
  * @brief  Commmon definitions
- * 
- * 
+ *
+ *
  */
 
 #ifndef _COMMON_H
@@ -33,7 +33,7 @@ struct HashData {
 	int majorVersion;
 	int minorVersion;
 	std::string name;
-	
+
 	typedef std::set<std::string> HashSet;
 	HashSet hashes;
 
@@ -46,7 +46,7 @@ struct HashData {
         ar & hashes;
     }
     HashData() : majorVersion(1), minorVersion(-1) { }
-	
+
 } ;
 BOOST_CLASS_TRACKING(HashData, boost::serialization::track_never)
 
