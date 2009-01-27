@@ -20,5 +20,6 @@ TARGET_LINK_LIBRARIES(tests ${USED_LIBS})
 ADD_TEST(tests tests)
 
 INSTALL(TARGETS gsb_updater gsb_redirector
-	RUNTIME DESTINATION bin
-	)
+	RUNTIME DESTINATION bin)
+
+
