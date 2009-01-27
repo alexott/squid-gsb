@@ -1,14 +1,10 @@
 /**
  * @file   tests.cpp
- * @author Alex Ott <alex_ott@securecomputing.com>
- * @date   $Date$
- * Revision: $Revision$
- * 
- * Copyright: WebWasherAG 
- * 
- * @brief  
- * 
- * 
+ * @author Alex Ott <alexott@gmail.com>
+ *
+ * @brief
+ *
+ *
  */
 
 #include <boost/test/minimal.hpp>
@@ -39,6 +35,6 @@ int test_main( int /*argc*/, char* /*argv*/[] ) {
 		BOOST_REQUIRE( h.minorVersion == 2 );
 	}
 
-	
+
 	return 0;
 }

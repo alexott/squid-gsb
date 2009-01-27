@@ -1,33 +1,29 @@
 /**
  * @file   common.cpp
- * @author Alex Ott <alex_ott@securecomputing.com>
- * @date   $Date$
- * Revision: $Revision$
- * 
- * Copyright: WebWasherAG 
- * 
- * @brief  
- * 
- * 
+ * @author Alex Ott <alexott@gmail.com>
+ *
+ * @brief
+ *
+ *
  */
 
 #include "common.h"
 #include "gsb-conf.h"
 
-/** 
- * 
- * 
- * @param argc 
- * @param argv 
- * @param cfg 
- * 
- * @return 
+/**
+ *
+ *
+ * @param argc
+ * @param argv
+ * @param cfg
+ *
+ * @return
  */
 bool parseOptions(int argc, char** argv, po::variables_map& cfg) {
 	bool result=false;
 	try {
 		std::string configFile;
-		
+
 		po::options_description command("Options");
 		command.add_options()
 			("config-file,c",
@@ -72,14 +68,14 @@ bool parseOptions(int argc, char** argv, po::variables_map& cfg) {
 			 po::value<bool>()->default_value(false),
 			 "")
 			;
-		
+
 		// read config file
 		std::ifstream is(configFile.c_str());
 		if(!is) {
 			std::cerr << command << std::endl;
 			return false;
 		}
-		
+
 		po::store(po::parse_config_file(is, cfg_opt), cfg);
 		po::notify(cfg);
 		is.close();
@@ -90,8 +86,8 @@ bool parseOptions(int argc, char** argv, po::variables_map& cfg) {
 		std::cerr << "Catch exception: " << x.what() << std::endl;
 #endif
 	}
-	
+
 	return result;
 }
 
-     
+

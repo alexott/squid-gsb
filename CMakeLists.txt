@@ -6,14 +6,10 @@ PROJECT(squid-gsb)
 #       -DBOOST_INCLUDEDIR=/home/ott/exp/include -DBOOST_LIBRARYDIR=/home/ott/exp/lib
 #
 
-# SET (CMAKE_MODULE_PATH ${cpptests_SOURCE_DIR}/cmake CACHE PATH "local cmake")
-
 SET(CMAKE_VERBOSE_MAKEFILE ON)
 
 ENABLE_TESTING()
 
-#INCLUDE_DIRECTORIES(~/exp/include)
-#LINK_DIRECTORIES(~/exp/lib)
 ADD_DEFINITIONS(-g -Wall -ansi -Wno-deprecated -DBOOST_TEST_DYN_LINK)
 
 SET(Boost_USE_STATIC_LIBS OFF)
@@ -26,5 +22,11 @@ IF(Boost_FOUND)
 	LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
 ENDIF(Boost_FOUND)
 
-# ======================================================================
+SET(GSB_CONFDIR "${CMAKE_INSTALL_PREFIX}/etc/squid-gsb" CACHE PATH "Directory with config file")
+SET(GSB_STATEDIR "${CMAKE_INSTALL_PREFIX}/var/cache/squid-gsb" CACHE PATH "Directory with data files")
+
+CONFIGURE_FILE(squid-gsb.conf.in ${CMAKE_CURRENT_BINARY_DIR}/squid-gsb.conf)
+
 add_subdirectory(src)
+
+

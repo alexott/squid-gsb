@@ -1,21 +1,18 @@
 /**
  * @file   gsb-conf.h
- * @author Alex Ott <alex_ott@securecomputing.com>
- * @date   $Date$
- * Revision: $Revision$
- * Copyright: WebWasher AG
- * 
- * @brief  
- * 
- * 
+ * @author Alex Ott <alexott@gmail.com>
+ *
+ * @brief
+ *
+ *
  */
 
 #ifndef _GSB_CONF_H
 #define _GSB_CONF_H 1
 
-#define __CONFFILE "@CONFDIR@/squid-gsb.conf"
-#define __BHFILE "@LSTATEDIR@/black-hash.dat"
-#define __MHFILE "@LSTATEDIR@/malware-hash.dat"
+#define __CONFFILE "@GSB_CONFDIR@/squid-gsb.conf"
+#define __BHFILE "@GSB_STATEDIR@/black-hash.dat"
+#define __MHFILE "@GSB_STATEDIR@/malware-hash.dat"
 
 #endif /* _GSB_CONF_H */
 

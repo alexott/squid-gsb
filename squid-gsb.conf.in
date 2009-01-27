@@ -1,5 +1,5 @@
-black-hash-file = @LSTATEDIR@/black-hash.dat
-malware-hash-file = @LSTATEDIR@/malware-hash.dat
+black-hash-file = @GSB_STATEDIR@/black-hash.dat
+malware-hash-file = @GSB_STATEDIR@/malware-hash.dat
 debug = 0
 #black-url = 
 #malware-url = 
