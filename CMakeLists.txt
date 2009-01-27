@@ -4,6 +4,7 @@ PROJECT(squid-gsb)
 # Usage: 
 #   cmake . -DCMAKE_INCLUDE_PATH=/home/ott/exp/include -DCMAKE_LIBRARY_PATH=/home/ott/exp/lib
 #       -DBOOST_INCLUDEDIR=/home/ott/exp/include -DBOOST_LIBRARYDIR=/home/ott/exp/lib
+#       -DCMAKE_INSTALL_PREFIX=....
 #
 
 SET(CMAKE_VERBOSE_MAKEFILE ON)
@@ -22,10 +23,24 @@ IF(Boost_FOUND)
 	LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
 ENDIF(Boost_FOUND)
 
-SET(GSB_CONFDIR "${CMAKE_INSTALL_PREFIX}/etc/squid-gsb" CACHE PATH "Directory with config file")
-SET(GSB_STATEDIR "${CMAKE_INSTALL_PREFIX}/var/cache/squid-gsb" CACHE PATH "Directory with data files")
+SET(PNAME "squid-gsb")
+SET(GSB_CONFDIR "etc/${PNAME}" CACHE PATH "Directory with config file")
+SET(GSB_STATEDIR "var/cache/${PNAME}" CACHE PATH "Directory with data files")
 
 CONFIGURE_FILE(squid-gsb.conf.in ${CMAKE_CURRENT_BINARY_DIR}/squid-gsb.conf)
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/squid-gsb.conf
+	DESTINATION ${GSB_CONFDIR}
+	PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ
+	)
+
+INSTALL(FILES data/bh.html data/mh.html DESTINATION share/${PNAME}/
+  PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
+
+INSTALL(FILES README AUTHORS COPYING NEWS
+  DESTINATION share/doc/${PNAME}/
+  PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
+
+INSTALL(CODE "file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${GSB_STATEDIR})")
 
 add_subdirectory(src)
 

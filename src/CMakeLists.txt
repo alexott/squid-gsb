@@ -18,3 +18,7 @@ TARGET_LINK_LIBRARIES(gsb_redirector ${USED_LIBS})
 ADD_EXECUTABLE(tests tests.cpp common.h)
 TARGET_LINK_LIBRARIES(tests ${USED_LIBS})
 ADD_TEST(tests tests)
+
+INSTALL(TARGETS gsb_updater gsb_redirector
+	RUNTIME DESTINATION bin
+	)
