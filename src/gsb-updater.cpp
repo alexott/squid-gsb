@@ -110,6 +110,7 @@ bool readData(HashData& h, std::istream& is) {
 		while(true) {
 			try {
 				std::getline(is,ts);
+				boost::trim(ts);
 				if(runDebug)
 					std::cerr <<  ts << std::endl;
 				if (is.eof() || is.fail() || ts == "") {
