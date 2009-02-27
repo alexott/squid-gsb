@@ -1,48 +1,71 @@
-#title Squid-GSB Documentation 
+#title Squid-GSB Documentation
+#keywords squid, google safe browsing, redirector, gsb
 
-This system provide support for Google Safe Browsing API in Squid.  It works as Squid
-redirector, and installed according the documentation for squid's redirectors.
+This system provide support for Google Safe Browsing API in Squid.  It implemented as
+Squid redirector, and installed according the documentation for squid's redirectors.
 
 * How to obtain it
 
-This software is available in source form from [[http://xtalk.msk.su/~ott/common/cf/squid-gsb-0.1.tar.gz][my site]].
+Latest versions of this software are available as source from repository at [[http://github.com/alexott/squid-gsb/tree/master][GitHub]].
+Stable releases are available from [[../../common/cf][my site]] as archives.
 
 * How to build
 
-To build you need to obtain [[http://www.boost.org][Boost]] 1.35. To compile project from scratch you need to run
-'bootstrap.sh' script and then run 'configure' to configure package.  If Boost is
-installed in non-standard place, you could use --with-boost-includes & --with-boost-libs
-options to specify where located include files and libs for Boost.
+To build *squid-gsb* you need to have [[http://www.boost.org][boost c++ libraries]] version 1.35 or higher, and [[http://cmake.org][CMake]],
+that is used to configuration & build of program.  To configure, you need to execute
+following command:
+
+<src lang="sh">
+cmake . -DCMAKE_INSTALL_PREFIX=install_path
+</src>
+
+If Boost is installed in non-standard place, you'll need to specify location of header
+files and libraries with  CMake's directives
+<code>-DBOOST_INCLUDEDIR=path_to_includes</code> and
+<code>-DBOOST_LIBRARYDIR=path_to_libraries</code>. 
+
+After configuration, you can build program with standard sequence of commands: =make= &&
+=make install=.
 
 It was successfully tested on Linux with kernel 2.6 (Ubuntu) and Mac OS X Tiger (10.4) on
-iMac.  Teoretically it should be compilable also on MS Windows, but i hadn't tried yet.
+iMac.  Theoretically it should be compilable also on MS Windows, but i hadn't tried yet.
 
 * How to run
 
-This system consiste from two utilities: updater (gsb-updater) & checker (gsb-redirector).
+This system consists from two utilities: updater (=gsb-updater=) & checker (=gsb-redirector=).
 Bot utilities accepts the same command-line options and use same configuration file.  Most
-important option -- '-c', specify where configuration file is located, by default used
-file PREFIX/etc/squid-gsb.conf. 
+important option -- =-c=, specify where configuration file is located, by default used file
+=squid-gsb.conf= in current directory.
 
-Updater should run periodically (once per half hour via cron, for example) and will
+Updater should run periodically (once per half hour via =cron=, for example) and will
 connect to the google and update hashes.
 
-Redirector run in endless loop and read url from stdin, check it agains hashes and output
-URL, if this site is found in correspondig hash, or empty line, if no matches found.
+Redirector run in endless loop and read url from stdin, check it against hashes and output
+URL, if this site is found in corresponding hash, or empty line, if no matches found.
 Utility automatically detects if hash files was updated and reload them.
+
 
 * Configuration files
 
 User could specify following options in configuration file (it's installed into
-PREFIX/etc/squid-gsb.conf):
+=PREFIX/etc/squid-gsb.conf=):
 
-  - black-hash-file -- file where black hash is stored. Default value =
-    PREFIX/var/squid-gsb/black-hash.dat 
-  - black-url (required) -- URL, that will substituted for sites, found in black list
-  - malware-hash-file -- file where malware hash is stored. Default value =
-    PREFIX/var/squid-gsb/malware-hash.dat 
-  - malware-url (required) -- URL, that will substituted for sites, found in malware list 
-  - key (required) -- key for connecting to Google Safe Browsing API and perform updates.
-    You can obtain it from [[http://code.google.com/apis/safebrowsing/][Google Safe Browsing API]] page
-  - debug -- specify - should we print debug information to stderr. Default value - no.
+ =black-hash-file= :: file where black hash is stored. Default value --
+   =PREFIX/var/squid-gsb/black-hash.dat=
+
+ =black-url= (required) :: URL, that will substituted for sites, found in black list
+
+ =malware-hash-file= :: file where malware hash is stored. Default value --
+   =PREFIX/var/squid-gsb/malware-hash.dat=
+
+ =malware-url= (required) :: URL, that will substituted for sites, found in malware list
+
+ =key= (required) :: key for connecting to Google Safe Browsing API and perform updates.
+   You can obtain it from [[http://code.google.com/apis/safebrowsing/][Google Safe Browsing API]] page
+
+ =debug= -- specify - should we print debug information to stderr. Default value -- =no=.
+
+
+
+;  LocalWords:  redirector GSB gsb
 
