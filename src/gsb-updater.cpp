@@ -1,25 +1,30 @@
 /**
  * @file   gsb-updater.cpp
  * @author Alex Ott <alexott@gmail.com>
- * 
- * @brief  
- * 
- * 
+ *
+ * @brief
+ *
+ *
  */
 
 #include "common.h"
 #include <boost/asio.hpp>
 #include <boost/regex.hpp>
 #include <iostream>
+#include <sstream>
+#include <cstdlib>
+#include <vector>
 
 namespace ba=boost::asio;
+
+typedef std::vector<char> char_vector;
 
 bool runDebug;
 std::string key;
 
-/** 
+/**
  * read hash from a given file
- * 
+ *
  * @param fname file name
  * @param h hash to read
  */
@@ -38,9 +43,9 @@ void readIfExists(const fs::path& fname,HashData& h) {
 	}
 }
 
-/** 
+/**
  * Write given hash to file
- * 
+ *
  * @param fname filename
  * @param h hash file
  */
@@ -71,20 +76,22 @@ void writeHash(const fs::path& fname,HashData& h) {
 			std::cerr << "Catch exception: " << x.what() << std::endl;
 
 	}
-	
+
 }
 
 bool readData(HashData& h, std::istream& is) {
 	std::string ts;
 	boost::smatch m;
-	
+
 	std::getline(is,ts);
+	if(runDebug)
+		std::cerr << "First line='" << ts << "'" << std::endl;
 	boost::regex hr("\\[(\\S+) (\\d)\\.(\\d+)( update)?\\]");
 
 	if(boost::regex_search(ts, m, hr, boost::match_extra)){
 		if(runDebug)
 			std::cerr << m[1].str() << " " << m[2].str() << " " << m[3].str() << std::endl;
-		
+
 		if(m[1].str() != h.name) {
 			if(runDebug)
 				std::cerr << "Wrong name of hash \"" << m[1].str() <<
@@ -97,59 +104,55 @@ bool readData(HashData& h, std::istream& is) {
 		}
 		h.majorVersion=boost::lexical_cast<int>(m[2].str());
 		h.minorVersion=boost::lexical_cast<int>(m[3].str());
-		
-		boost::regex sr("([+-])(\\S+)");
+
+		// boost::regex sr("([+-])(\\S+)");
 		HashData::HashSet::iterator hi;
 		while(true) {
 			try {
 				std::getline(is,ts);
+				if(runDebug)
+					std::cerr <<  ts << std::endl;
 				if (is.eof() || is.fail() || ts == "") {
 					break;
 				}
-				if(boost::regex_search(ts, m, sr, boost::match_extra)){
-					if(m[1].str() == "+") {
-						h.hashes.insert(m[2].str());
-					} else if (m[1].str() == "-") {
-					    if((hi=h.hashes.find(m[2].str())) != h.hashes.end()) {
-							h.hashes.erase(hi);
-						}
-					} else {
+				if(ts[0] == '+') {
+					h.hashes.insert(ts.substr(1));
+				} else if (ts[0] == '-') {
+					if((hi=h.hashes.find(ts.substr(1))) != h.hashes.end()) {
+						h.hashes.erase(hi);
 					}
 				} else {
 					if(runDebug)
-						std::cerr << "String not matched" << std::endl;
-
+						std::cerr << "String " << ts << " not matched" << std::endl;
 				}
 			} catch (std::exception& x) {
 				if(runDebug)
 					std::cerr << "Catch exception: " << x.what() << std::endl;
-
 			}
 		}
-		
-			
+
+
 	} else {
 		if(runDebug)
 			std::cerr << "First line not matched" << std::endl;
-
 	    return false;
 	}
-	
+
 	return true;
 }
 
-/** 
+/**
  * Update given hash file
- * 
+ *
  * @param h referense to hash file
- * 
+ *
  * @return true on successfull update
  */
 bool updateHash(HashData& h) {
 	bool result=false;
 	try {
 		std::string host("sb.google.com");
-		
+
 		ba::ip::tcp::iostream s(host.c_str(), "http");
 		if(!s) {
 			if(runDebug)
@@ -157,18 +160,20 @@ bool updateHash(HashData& h) {
 
 			return false;
 		}
-		
+
 		s << "GET " << "/safebrowsing/update?client=api&apikey="
 		  << key << "&version=" << h.name << ":" << h.majorVersion
 		  << ":" << h.minorVersion << " HTTP/1.1\r\n";
 		s << "Host: " << host << "\r\n\r\n" << std::flush;
-		
-		
+
+
 		boost::regex sr("HTTP/\\d\\.\\d (\\d+) \\S+");
 		std::string ts;
 		boost::smatch m;
 		const std::string cls("Content-Length: ");
+		const std::string tes("Transfer-Encoding: ");
 		const int clsl=16;
+		bool isChunked=false;
 
 		std::getline(s,ts);
 		if(runDebug)
@@ -193,7 +198,7 @@ bool updateHash(HashData& h) {
 			boost::trim(ts);
 			if(runDebug)
 				std::cerr << ts << std::endl;
- 
+
 			if (s.eof() || s.fail()) {
 				if(runDebug)
 					std::cerr << "End of stream" << std::endl;
@@ -206,15 +211,46 @@ bool updateHash(HashData& h) {
 			if(boost::istarts_with(ts,cls)) {
 				cl=boost::lexical_cast<int>(ts.substr(clsl));
 			}
+			if(boost::istarts_with(ts,tes) && ts.substr(19) == "chunked") {
+				isChunked=true;
+			}
 		}
-		if(cl != 0)
+		if(cl != 0 && !isChunked) {
 			result=readData(h,s);
+		} else if (isChunked) {
+			if(runDebug)
+				std::cerr << "Going to read in chunked encoding" << std::endl;
+			std::stringstream sstr;
+			char_vector v;
+
+			while(!s.eof()) {
+				std::getline(s,ts);
+				boost::trim(ts);
+				if(runDebug)
+					std::cerr << ts << std::endl;
+				if (ts == "0") {
+					if(runDebug)
+						std::cerr << "Last chunk" << std::endl;
+					break;
+				}
+				uint32_t clen=strtol(ts.c_str(),NULL,16);
+				if(runDebug)
+					std::cerr << "chunk length = " << clen << std::endl;
+				v.resize(clen);
+				s.read(&v[0],clen);
+				sstr.write(&v[0],clen);
+				std::getline(s,ts);
+				boost::trim(ts);
+			}
+			result=readData(h,sstr);
+		}
 	} catch(std::exception& x) {
 		if(runDebug)
 			std::cerr << "Catch exception: " << x.what() << std::endl;
 
 	}
-
+	if(runDebug)
+		std::cerr << "result = " << result << std::endl;
 	return result;
 }
 
@@ -235,11 +271,11 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
-	
+
 	HashData bh;
 	bh.name="goog-black-hash";
 	readIfExists(bhFileName,bh);
-	
+
  	HashData mh;
  	mh.name="goog-malware-hash";
  	readIfExists(mhFileName,mh);
@@ -263,5 +299,5 @@ int main(int argc, char** argv) {
 
 		writeHash(mhFileName,mh);
 	}
-	
+
 }
