@@ -33,7 +33,7 @@ struct md5
   {
     process(first, last);
   }
-  
+
   md5(const void* data, size_type len)
   {
     process(data, len);
@@ -70,7 +70,7 @@ private:
     context();
 
     context(const context&);
-    
+
     context& operator = (const context&);
 
     void reset();
@@ -139,7 +139,7 @@ template<typename charT, class traits>
 std::basic_ostream<charT, traits>&
 operator << (std::basic_ostream<charT, traits>& out, const md5& m)
 {
-  char buf[32];
+  char buf[40];
   for (int i = 0; i < 16; ++i)
     std::sprintf(buf+i*2, "%02x", m.digest()[i]);
   return out << buf;
