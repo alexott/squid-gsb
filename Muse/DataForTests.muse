@@ -3,3 +3,4 @@
 http://www.howwater.com/  -> da496e96679f98870c00054673a41df4
 
 
+http://malware.testing.google.test/testing/malware/ - in malware list

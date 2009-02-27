@@ -71,7 +71,7 @@ struct HashFile {
 		for(; it != itEnd; ++it) {
 			if ((hi=h.hashes.find(*it)) != h.hashes.end()) {
 				if(runDebug)
-					std::cerr << "Found match in " << h.name
+					std::cerr << "Match is found in " << h.name
 							  << ": " << *it << std::endl;
 
 				u=url;
@@ -231,7 +231,7 @@ int main(int argc, char** argv) {
 		std::getline(std::cin,url);
 		boost::trim(url);
 		if(runDebug)
-			std::cerr << "get " << url << " from std::cin" << std::endl;
+			std::cerr << "got " << url << " from std::cin" << std::endl;
 
 		if(count >= MaxCount) {
 			mh.updateHash();
