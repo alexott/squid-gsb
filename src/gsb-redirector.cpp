@@ -229,6 +229,11 @@ int main(int argc, char** argv) {
 	int count=MaxCount;
 	while(true) {
 		std::getline(std::cin,url);
+		if (std::cin.eof()) {
+			if(runDebug)
+				std::cerr << "got EOF from std::cin" << std::endl;
+		    break;
+		}
 		boost::trim(url);
 		if(runDebug)
 			std::cerr << "got " << url << " from std::cin" << std::endl;
