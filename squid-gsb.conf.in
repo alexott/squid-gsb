@@ -1,5 +1,5 @@
-black-hash-file = @CMAKE_INSTALL_PREFIX@/@GSB_STATEDIR@/black-hash.dat
-malware-hash-file = @CMAKE_INSTALL_PREFIX@/@GSB_STATEDIR@/malware-hash.dat
+black-hash-file = @GSB_STATEDIR@/black-hash.dat
+malware-hash-file = @GSB_STATEDIR@/malware-hash.dat
 debug = 0
 #black-url = 
 #malware-url = 

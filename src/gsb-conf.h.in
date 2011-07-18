@@ -10,9 +10,9 @@
 #ifndef _GSB_CONF_H
 #define _GSB_CONF_H 1
 
-#define __CONFFILE "@CMAKE_INSTALL_PREFIX@/@GSB_CONFDIR@/squid-gsb.conf"
-#define __BHFILE "@CMAKE_INSTALL_PREFIX@/@GSB_STATEDIR@/black-hash.dat"
-#define __MHFILE "@CMAKE_INSTALL_PREFIX@/@GSB_STATEDIR@/malware-hash.dat"
+#define __CONFFILE "@GSB_CONFDIR@/squid-gsb.conf"
+#define __BHFILE "@GSB_STATEDIR@/black-hash.dat"
+#define __MHFILE "@GSB_STATEDIR@/malware-hash.dat"
 
 #endif /* _GSB_CONF_H */
 
