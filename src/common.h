@@ -20,6 +20,8 @@
 #include <boost/serialization/set.hpp>
 #include <boost/serialization/string.hpp>
 
+//#define BOOST_FILESYSTEM_VERSION 2
+
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 

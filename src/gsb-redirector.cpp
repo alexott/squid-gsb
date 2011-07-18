@@ -30,10 +30,19 @@ struct HashFile {
 		std::time_t nt;
 		if(fs::exists(fname)) {
 			if(wtime < (nt=last_write_time(fname))) {
-				if(runDebug)
+				if(runDebug) {
+#if defined(BOOST_FILESYSTEM_VERSION) && (BOOST_FILESYSTEM_VERSION == 3)
+					std::cerr << "Going to read " << fname.string() << std::endl;
+#else
 					std::cerr << "Going to read " << fname.file_string() << std::endl;
+#endif
+				}
 
+#if defined(BOOST_FILESYSTEM_VERSION) && (BOOST_FILESYSTEM_VERSION == 3)
+				std::ifstream ifs(fname.string().c_str(), std::ios::binary);
+#else
 				std::ifstream ifs(fname.file_string().c_str(), std::ios::binary);
+#endif
 				if(!ifs) {
 					if(runDebug)
 						std::cerr << "Error opening " << fname << std::endl;

@@ -30,7 +30,11 @@ std::string key;
  */
 void readIfExists(const fs::path& fname,HashData& h) {
 	if(fs::exists(fname)) {
+#if defined(BOOST_FILESYSTEM_VERSION) && (BOOST_FILESYSTEM_VERSION == 3)
+		std::ifstream ifs(fname.string().c_str(), std::ios::binary);
+#else
 		std::ifstream ifs(fname.file_string().c_str(), std::ios::binary);
+#endif		
 		if(ifs) {
 			boost::archive::text_iarchive ia(ifs);
 			ia >> h;
@@ -51,8 +55,13 @@ void readIfExists(const fs::path& fname,HashData& h) {
  */
 void writeHash(const fs::path& fname,HashData& h) {
 	try {
+#if defined(BOOST_FILESYSTEM_VERSION) && (BOOST_FILESYSTEM_VERSION == 3)
+		fs::path tname=fname.string() + ".tmp";
+		std::ofstream ofs(tname.string().c_str(), std::ios::binary);
+#else
 		fs::path tname=fname.file_string() + ".tmp";
 		std::ofstream ofs(tname.file_string().c_str(), std::ios::binary);
+#endif
 		if (!ofs) {
 			if(runDebug)
 				std::cerr << "Error opening " << tname << std::endl;

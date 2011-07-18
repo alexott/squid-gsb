@@ -17,7 +17,7 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
 
 SET(Boost_USE_STATIC_LIBS OFF)
 SET(Boost_USE_MULTITHREAD ON)
-SET(Boost_ADDITIONAL_VERSIONS "1.38.0" "1.38" "1.37.0" "1.37" "1.36.0" "1.36")
+#SET(Boost_ADDITIONAL_VERSIONS "1.38.0" "1.38" "1.37.0" "1.37" "1.36.0" "1.36")
 FIND_PACKAGE(Boost 1.35.0 REQUIRED
   COMPONENTS system filesystem program_options thread serialization regex unit_test_framework)
 IF(Boost_FOUND)
