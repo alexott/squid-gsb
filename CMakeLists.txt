@@ -28,7 +28,7 @@ ENDIF(Boost_FOUND)
 
 SET(PNAME "squid-gsb")
 SET(GSB_CONFDIR "${CMAKE_INSTALL_PREFIX}/etc/${PNAME}" CACHE PATH "Directory with config file")
-SET(GSB_STATEDIR "${CMAKE_INSTALL_PREFIX}/var/cache/${PNAME}" CACHE PATH "Directory with data files")
+SET(GSB_STATEDIR "${CMAKE_INSTALL_PREFIX}/var/cache/${PNAME}/" CACHE PATH "Directory with data files")
 
 CONFIGURE_FILE(squid-gsb.conf.in ${CMAKE_CURRENT_BINARY_DIR}/squid-gsb.conf)
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/squid-gsb.conf
