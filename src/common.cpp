@@ -67,6 +67,9 @@ bool parseOptions(int argc, char** argv, po::variables_map& cfg) {
 			("debug",
 			 po::value<bool>()->default_value(false),
 			 "")
+			("emit-empty",
+			 po::value<bool>()->default_value(false),
+			 "")
 			;
 
 		// read config file

@@ -16,6 +16,8 @@ typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
 bool runDebug;
 
+static const std::string sEmptyString("");
+
 struct HashFile {
 	HashData h;
 	fs::path fname;
@@ -127,13 +129,7 @@ void generateHostVariants(const std::string& host, StringVector& hv) {
  */
 void generatePathVariants(const std::string& path, StringVector& pv) {
 	StringVector tsl;
-
-	boost::char_separator<char> pathsep("/");
-	tokenizer pathtokens(path, pathsep);
-	for (tokenizer::iterator tok_iter = pathtokens.begin();
-		 tok_iter != pathtokens.end(); ++tok_iter) {
-		tsl.push_back(*tok_iter);
-	}
+	boost::split( tsl, path, boost::is_any_of("/"), boost::token_compress_on );
 	unsigned int maxcount=tsl.size()-1;
 	if(maxcount >= 0) {
 		std::string t="/";
@@ -211,7 +207,26 @@ bool generateVariants(const std::string& url, StringVector& sv) {
 	return sv.size() > 0;
 }
 
-
+inline std::string produceResult(bool emitEmpty,
+								 const std::string& inputStr,
+								 const std::string& newURL,
+								 const StringVector& sv) 
+{
+	if(newURL.empty()) {
+		if(emitEmpty)
+			return sEmptyString;
+		else
+			return inputStr;
+	}
+	if(sv.size() == 1)
+		return newURL;
+	std::string tmp(newURL);
+	for (StringVector::const_iterator it=sv.begin()+1; it != sv.end(); ++it) {
+		tmp += ' ';
+		tmp += *it;
+	}
+	return tmp;
+}
 
 int main(int argc, char** argv) {
 	//read settings
@@ -221,8 +236,10 @@ int main(int argc, char** argv) {
 
 	HashFile bh;
 	HashFile mh;
+	bool emitEmptyString=false;
 	try {
 		runDebug=cfg["debug"].as<bool>();
+		emitEmptyString=cfg["emit-empty"].as<bool>();
 		bh.fname=cfg["black-hash-file"].as<std::string>();
 		bh.url=cfg["black-url"].as<std::string>();
 		mh.fname=cfg["malware-hash-file"].as<std::string>();
@@ -232,37 +249,47 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
-	std::string url;
+	std::string url, input;
 	StringVector sv;
 	const int MaxCount=10;
 	int count=MaxCount;
+
+	StringVector tsl;
 	while(true) {
-		std::getline(std::cin,url);
+		std::getline(std::cin, input);
 		if (std::cin.eof()) {
 			if(runDebug)
 				std::cerr << "got EOF from std::cin" << std::endl;
 		    break;
 		}
-		boost::trim(url);
+		boost::trim(input);
 		if(runDebug)
-			std::cerr << "got " << url << " from std::cin" << std::endl;
+			std::cerr << "got " << input << " from std::cin" << std::endl;
 
 		if(count >= MaxCount) {
 			mh.updateHash();
 			bh.updateHash();
 		}
 		if(bh.h.minorVersion == -1 && mh.h.minorVersion == -1) {
-			std::cout << "" << std::endl;
+			std::cout << produceResult(emitEmptyString, input, sEmptyString, tsl) << std::endl;
 			continue;
 		}
+
+		boost::split( tsl, input, boost::is_any_of(" \t"), boost::token_compress_on );
+		if(tsl.empty()) {
+			std::cout << produceResult(emitEmptyString, input, sEmptyString, tsl) << std::endl;
+			continue;
+		} 
+		url = tsl[0];
+
 		if(!generateVariants(url,sv)) {
-			std::cout << "" << std::endl;
+			std::cout << produceResult(emitEmptyString, input, sEmptyString, tsl) << std::endl;
 			continue;
 		}
 		if(bh.checkHash(sv,url) || mh.checkHash(sv,url))
-			std::cout << url << std::endl;
+			std::cout << produceResult(emitEmptyString, input, url, tsl) << std::endl;
 		else
-			std::cout << "" << std::endl;
+			std::cout << produceResult(emitEmptyString, input, sEmptyString, tsl) << std::endl;
 	}
 
 	return 0;

@@ -22,7 +22,10 @@ cmake . -DCMAKE_INSTALL_PREFIX=install_path
 If Boost is installed in non-standard place, you'll need to specify location of header
 files and libraries with  CMake's directives
 <code>-DBOOST_INCLUDEDIR=path_to_includes</code> and
-<code>-DBOOST_LIBRARYDIR=path_to_libraries</code>. 
+<code>-DBOOST_LIBRARYDIR=path_to_libraries</code>.   
+
+You can also use =GSB_CONFDIR= and =GSB_STATEDIR= to specify directories where configuration
+file and data files will stored.
 
 After configuration, you can build program with standard sequence of commands: =make= &&
 =make install=.
@@ -63,9 +66,10 @@ User could specify following options in configuration file (it's installed into
  =key= (required) :: key for connecting to Google Safe Browsing API and perform updates.
    You can obtain it from [[http://code.google.com/apis/safebrowsing/][Google Safe Browsing API]] page
 
- =debug= -- specify - should we print debug information to stderr. Default value -- =no=.
+ =debug= -- specify should we print debug information to stderr. Default value -- =no=.
 
-
+ =emit-emoty= -- if set, then will output empty string for not modified URLs, reproducing
+ behaviour of Squid2-style redirectors. Default value -- =no=.
 
 ;  LocalWords:  redirector GSB gsb
 
